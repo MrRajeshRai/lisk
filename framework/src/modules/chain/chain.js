@@ -102,6 +102,13 @@ module.exports = class Chain {
 		const BlockReward = require('./logic/block_reward');
 		this.blockReward = new BlockReward();
 
+		if (this.options.loading.snapshotRound) {
+			this.options.network.enabled = false;
+			this.options.network.list = [];
+			this.options.broadcasts.active = false;
+			this.options.syncing.active = false;
+		}
+
 		try {
 			// Cache
 			this.logger.debug('Initiating cache...');
