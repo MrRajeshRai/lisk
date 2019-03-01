@@ -11,3 +11,19 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+lisk:
+  network: test
+  database:
+    user: lisk
+    password: lisk
+  image:
+    repository: lisk/core
+    tag: 1.5.0-rc.2
+    pullPolicy: IfNotPresent
+
+postgresql:
+  image:
+    repository: postgres
+    tag: 10-alpine
+    pullPolicy: IfNotPresent

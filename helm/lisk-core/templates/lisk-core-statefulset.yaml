@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: "{{ .Release.Name }}-lisk-core"
+  labels:
+    app.kubernetes.io/name: "{{ include "lisk-core.name" . }}"
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ include "lisk-core.chart" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "{{ include "lisk-core.name" . }}"
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: "{{ include "lisk-core.name" . }}"
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: lisk
+          image: {{ .Values.lisk.image.repository }}:{{ .Values.lisk.image.tag }}
+          env:
+            - name: LISK_DB_USER
+              value: {{ .Values.lisk.database.user }}
+            - name: LISK_DB_PASSWORD
+              value: {{ .Values.lisk.database.password }}
+            - name: LISK_DB_NAME
+              value: {{ .Values.lisk.network }}
+        - name: database
+          image: {{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
+          imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.lisk.database.user }}
+            - name: POSTGRES_DB
+              value: {{ .Values.lisk.network }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.lisk.database.password }}
+
