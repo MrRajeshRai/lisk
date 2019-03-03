@@ -1,6 +1,7 @@
 const Application = require('./controller/application');
 const constants = require('./controller/defaults/constants');
 const version = require('./version');
+const validator = require('./controller/helpers/validator');
 
 /**
  * @namespace framework
@@ -10,4 +11,7 @@ module.exports = {
 	Application,
 	constants,
 	version,
+	helpers: {
+		validator,
+	},
 };

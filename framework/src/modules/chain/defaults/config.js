@@ -81,7 +81,7 @@ const DefaultConfig = {
 				delegates: {
 					type: 'array',
 					default: [],
-					arg: ['LISK_FORGING_DELEGATES', 'stringToDelegateList'],
+					env: ['LISK_FORGING_DELEGATES', 'stringToDelegateList'],
 					items: {
 						properties: {
 							encryptedPassphrase: {
