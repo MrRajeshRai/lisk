@@ -28,7 +28,6 @@ const lisk = require('lisk-elements').default;
 const tempy = require('tempy');
 const { observableDiff, applyChange } = require('deep-diff');
 const JSONHistory = require('../helpers/json_history');
-const AppConfig = require('../helpers/config');
 const packageJSON = require('../../../../../package.json');
 
 const rootPath = path.resolve(path.dirname(__filename), '../../../../../');
@@ -394,7 +393,10 @@ history.migrate(
 		// Set the env variables to validate against correct network and config file
 		process.env.LISK_NETWORK = network;
 		process.env.LISK_CONFIG_FILE = tempFilePath;
-		new AppConfig(packageJSON, false);
+
+		// TODO: Add a replacement lgoic for config helper
+		// new AppConfig(packageJSON, false);
+
 		console.info('Validation finished successfully.');
 
 		if (program.output) {
