@@ -10,6 +10,16 @@ metadata:
     helm.sh/chart: {{ include "lisk-core.chart" . }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  {{- if .Values.persistence.enable }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.persistence.storage }}
+  {{- end }}
   updateStrategy:
     type: RollingUpdate
   selector:
@@ -32,9 +42,19 @@ spec:
               value: {{ .Values.lisk.database.password }}
             - name: LISK_DB_NAME
               value: {{ .Values.lisk.network }}
+            - name: LISK_CONSOLE_LOG_LEVEL
+              value: {{ .Values.lisk.loglevel }}
+          command:
+            - "node"
+            - "/home/lisk/lisk/app.js"
+            - "-n"
+            - {{ .Values.lisk.network }}
         - name: database
           image: {{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
           imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
           env:
             - name: POSTGRES_USER
               value: {{ .Values.lisk.database.user }}

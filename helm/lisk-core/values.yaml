@@ -1,6 +1,10 @@
 ---
 replicaCount: 1
 
+persistence:
+  enable: true
+  storage: 5Gi
+
 nameOverride: ""
 fullnameOverride: ""
 
@@ -13,7 +17,8 @@ tolerations: []
 affinity: {}
 
 lisk:
-  network: test
+  loglevel: info
+  network: testnet
   database:
     user: lisk
     password: lisk
