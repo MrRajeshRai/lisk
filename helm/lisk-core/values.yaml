@@ -17,8 +17,9 @@ tolerations: []
 affinity: {}
 
 lisk:
-  loglevel: info
+  loglevel: warn
   network: testnet
+  coldstart: true
   database:
     user: lisk
     password: lisk

@@ -32,6 +32,31 @@ spec:
         app.kubernetes.io/name: "{{ include "lisk-core.name" . }}"
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      volumes:
+        - name: initdb
+          emptyDir: {}
+      {{- if .Values.lisk.coldstart }}
+      initContainers:
+        - name: download-snapshot
+          image: busybox
+          volumeMounts:
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              if [ -f /var/lib/postgresql/data/PG_VERSION ] ; then
+                echo "Database already initialized, skipping download."
+              else
+                wget https://downloads.lisk.io/lisk/test/blockchain.db.gz -O /docker-entrypoint-initdb.d/00-blockchain.sql.gz
+                cat <<EOF > /docker-entrypoint-initdb.d/99-clean-up.sh
+              rm /docker-entrypoint-initdb.d/00-blockchain.sql.gz
+              EOF
+              fi
+      {{- end }}
       containers:
         - name: lisk
           image: {{ .Values.lisk.image.repository }}:{{ .Values.lisk.image.tag }}
@@ -45,6 +70,9 @@ spec:
             - name: LISK_CONSOLE_LOG_LEVEL
               value: {{ .Values.lisk.loglevel }}
           command:
+            - "/home/lisk/wait-for-it.sh"
+            - "127.0.0.1:5432"
+            - "--"
             - "node"
             - "/home/lisk/lisk/app.js"
             - "-n"
@@ -53,6 +81,8 @@ spec:
           image: {{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
           imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}
           volumeMounts:
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d
             - name: data
               mountPath: /var/lib/postgresql/data
           env:
