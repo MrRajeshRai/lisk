@@ -71,6 +71,8 @@ spec:
               value: {{ .Values.lisk.loglevel }}
           command:
             - "/home/lisk/wait-for-it.sh"
+            - "-t"
+            - "0"
             - "127.0.0.1:5432"
             - "--"
             - "node"
