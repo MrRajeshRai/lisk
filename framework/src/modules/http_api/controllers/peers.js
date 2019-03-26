@@ -69,8 +69,8 @@ PeersController.getPeers = async function(context, next) {
 		return next(null, {
 			data: peersByFilters,
 			meta: {
-				offset: filters.offset,
-				limit: filters.limit,
+				offset: params.offset.value,
+				limit: params.limit.value,
 				count: peersCount,
 			},
 		});
