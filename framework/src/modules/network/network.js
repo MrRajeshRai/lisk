@@ -38,6 +38,22 @@ module.exports = class Network {
 		this.logger = createLoggerComponent(loggerConfig);
 
 		const initialNodeInfo = await this.channel.invoke('chain:getNodeInfo');
+		// Receive peer list from config file and remo
+		const peersWithIpAddressField = this.options.config.peers.list.map(peer => {
+			const { ip, ...peerWithoutIp } = peer;
+
+			return { ipAddress: ip, ...peerWithoutIp };
+		});
+		// TODO: To be handled in P2P library so that it doesn't try to connect itself
+		const removeOwnNode = peersWithIpAddressField.filter(peer => {
+			if (
+				+this.options.config.wsPort === +peer.wsPort &&
+				peer.ipAddress === '127.0.0.1'
+			) {
+				return false;
+			}
+			return true;
+		});
 
 		const p2pConfig = {
 			...this.options,
@@ -45,6 +61,7 @@ module.exports = class Network {
 				...initialNodeInfo,
 				wsPort: this.options.nodeInfo.wsPort,
 			},
+			seedPeers: removeOwnNode,
 		};
 
 		this.p2p = new P2P(p2pConfig);
