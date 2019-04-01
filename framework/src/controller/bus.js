@@ -106,9 +106,6 @@ class Bus extends EventEmitter2 {
 	 * @throws {Error} If event name does not exist to bus.
 	 */
 	emit(eventName, eventValue) {
-		if (!this.getEvents().includes(eventName)) {
-			throw new Error(`Event ${eventName} is not registered to bus.`);
-		}
 		super.emit(eventName, eventValue); // Use Emit function from EventEmitter2 package
 	}
 
