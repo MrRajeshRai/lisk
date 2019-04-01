@@ -72,6 +72,8 @@ module.exports = class ChainModule extends BaseModule {
 			loaderLoaded: async () => this.chain.actions.loaderLoaded(),
 			loaderSyncing: async () => this.chain.actions.loaderSyncing(),
 			getForgersKeyPairs: async () => this.chain.actions.getForgersKeyPairs(),
+			getTransactions: async () => this.chain.actions.getTransactions(),
+			getSignatures: async () => this.chain.actions.getSignatures(),
 			getUnProcessedTransactions: async action =>
 				this.chain.actions.getUnProcessedTransactions(action),
 			getUnconfirmedTransactions: async action =>
@@ -84,6 +86,8 @@ module.exports = class ChainModule extends BaseModule {
 				this.chain.actions.postTransaction(action),
 			getDelegateBlocksRewards: async action =>
 				this.chain.actions.getDelegateBlocksRewards(action),
+			blocks: async action =>
+				this.chain.actions.blocks(action),
 		};
 	}
 

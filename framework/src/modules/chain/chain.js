@@ -181,7 +181,9 @@ module.exports = class Chain {
 			scope.bus.message('bind', scope);
 
 			// Listen to websockets
-			await scope.webSocket.listen();
+			if (scope.config.peers.enabled) {
+				await scope.webSocket.listen();
+			}
 			self.logger.info('Modules ready and launched');
 
 			self.scope = scope;
@@ -245,6 +247,27 @@ module.exports = class Chain {
 			loaderSyncing: async () => this.scope.modules.loader.syncing(),
 			getForgersKeyPairs: async () =>
 				this.scope.modules.delegates.getForgersKeyPairs(),
+			getTransactions: async () =>
+				this.scope.modules.transactions.getMergedTransactionList(
+					true,
+					global.constants.MAX_SHARED_TRANSACTIONS
+				),
+			getSignatures: async () => {
+				const transactions = this.scope.modules.transactions.getMultisignatureTransactionList(
+					true,
+					global.constants.MAX_SHARED_TRANSACTIONS
+				);
+				const multisignatures = [];
+				transactions.forEach(transaction => {
+					if (transaction.signatures && transaction.signatures.length) {
+						multisignatures.push({
+							transaction: transaction.id,
+							signatures: transaction.signatures,
+						});
+					}
+				});
+				return multisignatures;
+			},
 			getUnProcessedTransactions: async action =>
 				this.scope.modules.transactions.shared.getUnProcessedTransactions(
 					action.params[0],
@@ -272,6 +295,40 @@ module.exports = class Chain {
 					action.params[0],
 					action.params[1]
 				),
+			blocks: async action =>
+				new Promise(resolve => {
+					// Get 34 blocks with all data (joins) from provided block id
+					// According to maxium payload of 58150 bytes per block with every transaction being a vote
+					// Discounting maxium compression setting used in middleware
+					// Maximum transport payload = 2000000 bytes
+					const query = action.params[0] || {};
+					this.scope.modules.blocks.utils.loadBlocksData(
+						{
+							limit: 34, // 1977100 bytes
+							lastId: query.lastBlockId,
+						},
+						(err, data) => {
+							(data || []).forEach(block => {
+								if (block.tf_data) {
+									try {
+										block.tf_data = block.tf_data.toString('utf8');
+									} catch (e) {
+										this.logger.error(
+											'Transport->blocks: Failed to convert data field to UTF-8',
+											{ block, error: e }
+										);
+									}
+								}
+							});
+							if (err) {
+								// TODO: Reject here.
+								return resolve({ blocks: [] });
+							}
+
+							return resolve({ blocks: data });
+						}
+					);
+				}),
 		};
 	}
 
