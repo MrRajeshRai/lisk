@@ -38,8 +38,11 @@ module.exports = class Network {
 		this.logger = createLoggerComponent(loggerConfig);
 
 		const initialNodeInfo = await this.channel.invoke('chain:getNodeInfo');
-		// Receive peer list from config file and remo
-		const peersWithIpAddressField = this.options.config.peers.list.map(peer => {
+		// Receive peer list from the config file and pass it as seed peers in P2P
+		const peersFromConfig = this.options.config.peers
+			? this.options.config.peers.list
+			: [];
+		const peersWithIpAddressField = peersFromConfig.map(peer => {
 			const { ip, ...peerWithoutIp } = peer;
 
 			return { ipAddress: ip, ...peerWithoutIp };
