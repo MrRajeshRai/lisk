@@ -100,16 +100,16 @@ module.exports = class Network {
 			);
 		});
 		this.p2p.on(EVENT_FAILED_TO_FETCH_PEER_INFO, error => {
-			this.logger.debug(error.message);
+			this.logger.debug(error.message || error);
 		});
 		this.p2p.on(EVENT_FAILED_TO_PUSH_NODE_INFO, error => {
-			this.logger.debug(error.message);
+			this.logger.debug(error.message || error);
 		});
 		this.p2p.on(EVENT_OUTBOUND_SOCKET_ERROR, error => {
-			this.logger.debug(error.message);
+			this.logger.debug(error.message || error);
 		});
 		this.p2p.on(EVENT_INBOUND_SOCKET_ERROR, error => {
-			this.logger.debug(error.message);
+			this.logger.debug(error.message || error);
 		});
 		this.p2p.on(EVENT_UPDATED_PEER_INFO, peerInfo => {
 			this.logger.info(
@@ -119,7 +119,7 @@ module.exports = class Network {
 			);
 		});
 		this.p2p.on(EVENT_FAILED_PEER_INFO_UPDATE, error => {
-			this.logger.debug(error.message);
+			this.logger.debug(error.message || error);
 		});
 
 		this.p2p.on(EVENT_REQUEST_RECEIVED, async request => {
