@@ -16,7 +16,7 @@
 
 const _ = require('lodash');
 const { getByFilter, getCountByFilter } = require('../helpers/filter_peers');
-
+const swaggerHelper = require('../helpers/swagger');
 // Private Fields
 let channel;
 
@@ -41,6 +41,12 @@ function PeersController(scope) {
  * @todo Add description for the function and the params
  */
 PeersController.getPeers = async function(context, next) {
+	const invalidParams = swaggerHelper.invalidParams(context.request);
+
+	if (invalidParams.length) {
+		return next(swaggerHelper.generateParamsErrorObject(invalidParams));
+	}
+
 	const params = context.request.swagger.params;
 
 	let filters = {
