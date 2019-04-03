@@ -123,9 +123,9 @@ module.exports = class Chain {
 
 			// TODO: Use the channel application state for update node info
 			// Publish an event whenever the system headers are updated.
-			this.system.on('update', nodeInfo => {
-				this.channel.publish('chain:system:updateNodeInfo', nodeInfo);
-			});
+			// this.system.on('update', nodeInfo => {
+			// 	this.channel.publish('chain:system:updateNodeInfo', nodeInfo);
+			// });
 
 			if (!this.options.config) {
 				throw Error('Failed to assign nethash from genesis block');
@@ -205,7 +205,8 @@ module.exports = class Chain {
 
 	get actions() {
 		return {
-			getNodeInfo: () => this.system.headers,
+			// TODO: Return nodeinfo on update event on node info
+			getNodeInfo: () => {},
 			calculateSupply: action =>
 				this.blockReward.calcSupply(action.params.height),
 			calculateMilestone: action =>
